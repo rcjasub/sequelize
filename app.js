@@ -2,8 +2,11 @@ require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const app = express();
 const apiRouter = require("./api");
+const { router: authRouter } = require("./auth");
 const { db } = require("./database");
 const cors = require("cors");
 
@@ -14,9 +17,13 @@ app.use(express.json());
 
 app.use(cors()); // allow all origins
 
+// cookie parser middleware
+app.use(cookieParser());
+
 app.use(morgan("dev")); // logging middleware
 app.use(express.static(path.join(__dirname, "public"))); // serve static files from public folder
 app.use("/api", apiRouter); // mount api router
+app.use("/auth", authRouter); // mount auth router
 
 // error handling middleware
 app.use((err, req, res, next) => {
