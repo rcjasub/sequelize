@@ -11,12 +11,12 @@ const authenticateJWT = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ error: "Access token required" });
+    return res.status(401).send({ error: "Access token required" });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      return res.status(403).json({ error: "Invalid or expired token" });
+      return res.status(403).send({ error: "Invalid or expired token" });
     }
     req.user = user;
     next();
@@ -31,19 +31,19 @@ router.post("/signup", async (req, res) => {
     if (!username || !password) {
       return res
         .status(400)
-        .json({ error: "Username and password are required" });
+        .send({ error: "Username and password are required" });
     }
 
     if (password.length < 6) {
       return res
         .status(400)
-        .json({ error: "Password must be at least 6 characters long" });
+        .send({ error: "Password must be at least 6 characters long" });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser) {
-      return res.status(409).json({ error: "Username already exists" });
+      return res.status(409).send({ error: "Username already exists" });
     }
 
     // Create new user
@@ -65,13 +65,13 @@ router.post("/signup", async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
-    res.json({
+    res.send({
       message: "User created successfully",
       user: { id: user.id, username: user.username },
     });
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).send({ error: "Internal server error" });
   }
 });
 
@@ -83,18 +83,18 @@ router.post("/login", async (req, res) => {
     if (!username || !password) {
       return res
         .status(400)
-        .json({ error: "Username and password are required" });
+        .send({ error: "Username and password are required" });
     }
 
     // Find user
     const user = await User.findOne({ where: { username } });
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).send({ error: "Invalid credentials" });
     }
 
     // Check password
     if (!user.checkPassword(password)) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).send({ error: "Invalid credentials" });
     }
 
     // Generate JWT token
@@ -112,25 +112,25 @@ router.post("/login", async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
-    res.json({
+    res.send({
       message: "Login successful",
       user: { id: user.id, username: user.username },
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).send({ error: "Internal server error" });
   }
 });
 
 // Logout route
 router.post("/logout", (req, res) => {
   res.clearCookie("token");
-  res.json({ message: "Logout successful" });
+  res.send({ message: "Logout successful" });
 });
 
 // Get current user route (protected)
 router.get("/me", authenticateJWT, (req, res) => {
-  res.json({ user: req.user });
+  res.send({ user: req.user });
 });
 
 module.exports = { router, authenticateJWT };
