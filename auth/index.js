@@ -60,7 +60,7 @@ router.post("/signup", async (req, res) => {
     // Set token as HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
@@ -81,13 +81,13 @@ router.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res
-        .status(400)
-        .send({ error: "Username and password are required" });
+      res.status(400).send({ error: "Username and password are required" });
+      return;
     }
 
     // Find user
     const user = await User.findOne({ where: { username } });
+    user.checkPassword(password);
     if (!user) {
       return res.status(401).send({ error: "Invalid credentials" });
     }

@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+// cookie parser middleware
+app.use(cookieParser());
 const app = express();
 const apiRouter = require("./api");
 const { router: authRouter } = require("./auth");
@@ -11,11 +13,17 @@ const { db } = require("./database");
 const cors = require("cors");
 
 const PORT = process.env.PORT || 8080;
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 // body parser middleware
 app.use(express.json());
 
-app.use(cors()); // allow all origins
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 // cookie parser middleware
 app.use(cookieParser());
