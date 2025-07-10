@@ -6,7 +6,8 @@
     "start": "node app.js",
     "build": "npm install",
     "start-dev": "NODE_ENV=development nodemon app.js",
-    "seed": "node database/seed.js"
+    "seed": "node database/seed.js",
+    "type": "module"
   },
   "keywords": [],
   "author": "",

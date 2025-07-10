@@ -1,5 +1,7 @@
 const { DataTypes } = require("sequelize");
 const db = require("./db");
+const Pond = require("./pond")
+const Duck = require("./duck");
 const bcrypt = require("bcrypt");
 
 const User = db.define("user", {
@@ -26,5 +28,16 @@ User.prototype.checkPassword = function (password) {
 User.hashPassword = function (password) {
   return bcrypt.hashSync(password, 10);
 };
+
+User.prototype.getAllDucks = async function () {
+  const ducks = await Duck.findAll({
+    include: [{
+      model: Pond,
+      where: { userId: this.id },  
+    }]
+  });
+
+  return ducks
+}
 
 module.exports = User;

@@ -1,5 +1,5 @@
 const db = require("./db");
-const { Duck, User } = require("./index");
+const { Duck, User, Pond } = require("./index");
 
 const seed = async () => {
   db.logging = false;
@@ -11,10 +11,16 @@ const seed = async () => {
     { username: "user2", passwordHash: User.hashPassword("password") },
   ]);
 
+  const pond = await Pond.bulkCreate([
+    { name: "North Pond", userId: users[0].id },
+    { name: "South Pond", userId: users[1].id },
+    { name: "West Pond", userId: users[2].id },
+  ]);
+
   const ducks = await Duck.bulkCreate([
-    { name: "James Pond" },
-    { name: "Quakie Chan" },
-    { name: "Goose" },
+    { name: "James Pond", pondId: pond[0].id },
+    { name: "Quakie Chan", pondId: pond[1].id },
+    { name: "Goose", pondId: pond[2].id },
   ]);
 
   console.log(`🦆 Created ${ducks.length} ducks`);
