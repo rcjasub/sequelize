@@ -29,15 +29,17 @@ User.hashPassword = function (password) {
   return bcrypt.hashSync(password, 10);
 };
 
-User.prototype.getAllDucks = async function () {
+// New instance method to fetch all ducks in user's ponds
+User.prototype.ducks = async function () {
+  const ponds = await Pond.findAll({ where: { userId: this.id } });
+  const pondIds = ponds.map(p => p.id);
+
   const ducks = await Duck.findAll({
-    include: [{
-      model: Pond,
-      where: { userId: this.id },  
-    }]
+    where: { pondId: pondIds },
+    include: Pond, 
   });
 
-  return ducks
-}
+  return ducks;
+};
 
 module.exports = User;
